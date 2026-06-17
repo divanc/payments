@@ -4,3 +4,7 @@ sqlite/
 
 # build output
 /payments
+
+# local environment / secrets
+.env
+.env.*
