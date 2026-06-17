@@ -44,3 +44,28 @@ func (s *Service) CreateCustomer(ctx context.Context, email string) (Customer, e
 
 	return s.repo.CreateCustomer(ctx, email, string(gid))
 }
+
+// CreatePurchase charges an existing customer and records the purchase. The flow is
+// charge-then-insert: the customer is verified, the gateway is charged, and the result
+// is persisted. There is no rollback if the insert fails after a successful charge.
+func (s *Service) CreatePurchase(
+	ctx context.Context,
+	customerID int64,
+	amount int,
+) (Purchase, error) {
+	if amount <= 0 {
+		return Purchase{}, ErrInvalidAmount
+	}
+
+	c, err := s.repo.GetCustomerByID(ctx, customerID)
+	if err != nil {
+		return Purchase{}, err
+	}
+
+	chargeID, err := s.gw.Charge(ctx, gateway.CustomerID(c.GatewayCustomerID), amount)
+	if err != nil {
+		return Purchase{}, fmt.Errorf("%w: %v", ErrGateway, err)
+	}
+
+	return s.repo.InsertPurchase(ctx, customerID, amount, "usd", string(chargeID))
+}

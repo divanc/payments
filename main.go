@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/divanc/payments/api"
 	"github.com/divanc/payments/gateway"
@@ -28,6 +29,13 @@ func main() {
 	}
 
 	gw := gateway.NewFake()
+	if d := os.Getenv("FAKE_CHARGE_DELAY"); d != "" {
+		delay, err := time.ParseDuration(d)
+		if err != nil {
+			log.Fatalf("parse FAKE_CHARGE_DELAY: %v", err)
+		}
+		gw.ChargeLatency = delay
+	}
 	svc := purchases.NewService(repo, gw)
 	handler := api.NewHandler(svc)
 

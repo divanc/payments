@@ -10,6 +10,7 @@ import (
 // Service is the business-logic port the HTTP layer depends on.
 type Service interface {
 	CreateCustomer(ctx context.Context, email string) (purchases.Customer, error)
+	CreatePurchase(ctx context.Context, customerID int64, amount int) (purchases.Purchase, error)
 }
 
 type Handler struct {
@@ -20,6 +21,7 @@ type Handler struct {
 func NewHandler(svc Service) *Handler {
 	h := &Handler{svc: svc, mux: http.NewServeMux()}
 	h.mux.HandleFunc("POST /v1/customers", h.createCustomer)
+	h.mux.HandleFunc("POST /v1/purchases", h.createPurchase)
 	return h
 }
 
