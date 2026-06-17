@@ -11,6 +11,7 @@ import (
 type Service interface {
 	CreateCustomer(ctx context.Context, email string) (purchases.Customer, error)
 	CreatePurchase(ctx context.Context, customerID int64, amount int) (purchases.Purchase, error)
+	GetCustomer(ctx context.Context, id int64) (purchases.Customer, []purchases.Purchase, error)
 }
 
 type Handler struct {
@@ -21,6 +22,7 @@ type Handler struct {
 func NewHandler(svc Service) *Handler {
 	h := &Handler{svc: svc, mux: http.NewServeMux()}
 	h.mux.HandleFunc("POST /v1/customers", h.createCustomer)
+	h.mux.HandleFunc("GET /v1/customers/{id}", h.getCustomer)
 	h.mux.HandleFunc("POST /v1/purchases", h.createPurchase)
 	return h
 }
