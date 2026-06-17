@@ -1,0 +1,6 @@
+# local sqlite databases
+sqlite/
+*.db
+
+# build output
+/payments
