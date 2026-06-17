@@ -2,12 +2,6 @@
 
 Small HTTP payments API over a payment gateway, backed by SQLite.
 
-## Commands
-
-- Run: `go run .`
-- Test: `go test ./...`
-- Build / vet / format: `go build ./...`, `go vet ./...`, `gofmt -w .`
-
 ## Architecture
 
 Hexagonal. Dependencies point inward:
